@@ -12,44 +12,85 @@
 [package]
 edition = "2021"
 rust-version = "1.85"
-name = "font-types"
-version = "0.11.2"
+name = "read-fonts"
+version = "0.39.1"
 build = false
 autolib = false
 autobins = false
 autoexamples = false
 autotests = false
 autobenches = false
-description = "Scalar types used in fonts."
+description = "Reading OpenType font files."
 readme = "README.md"
-categories = ["text-processing"]
+categories = [
+    "text-processing",
+    "parsing",
+    "graphics",
+]
 license = "MIT OR Apache-2.0"
 repository = "https://github.com/googlefonts/fontations"
 
 [package.metadata.docs.rs]
-all-features = true
+features = [
+    "libm",
+    "serde",
+    "std",
+]
 
 [features]
-bytemuck = ["dep:bytemuck"]
-serde = ["dep:serde"]
-std = []
+agl = []
+codegen_test = []
+default = ["std"]
+experimental_traverse = ["std"]
+ift = []
+libm = ["dep:core_maths"]
+scaler_test = []
+serde = [
+    "dep:serde",
+    "font-types/serde",
+]
+spec_next = []
+std = ["font-types/std"]
 
 [lib]
-name = "font_types"
+name = "read_fonts"
 path = "src/lib.rs"
+
+[[bench]]
+name = "bench_helper"
+path = "benches/bench_helper.rs"
+
+[[bench]]
+name = "int_set_benchmark"
+path = "benches/int_set_benchmark.rs"
+harness = false
+
+[[bench]]
+name = "sparse_bit_set_benchmark"
+path = "benches/sparse_bit_set_benchmark.rs"
+harness = false
 
 [dependencies.bytemuck]
 version = "1.13.1"
-features = [
-    "derive",
-    "min_const_generics",
-]
+
+[dependencies.core_maths]
+version = "0.1"
 optional = true
+
+[dependencies.font-types]
+version = "0.11.2"
+features = ["bytemuck"]
 
 [dependencies.serde]
 version = "1.0"
 features = ["derive"]
 optional = true
+
+[dev-dependencies.criterion]
+version = "0.3.0"
+
+[dev-dependencies.rand]
+version = "0.8.5"
 
 [dev-dependencies.serde_json]
 version = "1.0"
