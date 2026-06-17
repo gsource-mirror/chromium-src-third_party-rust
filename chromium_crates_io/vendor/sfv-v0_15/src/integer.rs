@@ -29,11 +29,15 @@ impl Integer {
     /// Equivalent to `Integer::constant(0)`.
     pub const ZERO: Self = Self(0);
 
-    /// Creates an `Integer`, panicking if the value is out of range.
+    /// Creates an `Integer`.
     ///
     /// This method is intended to be called from `const` contexts in which the
     /// value is known to be valid. Use [`TryFrom::try_from`] for non-panicking
     /// conversions.
+    ///
+    /// # Panics
+    ///
+    /// Panics if the given value is out of range.
     #[must_use]
     pub const fn constant(v: i64) -> Self {
         if v >= Self::MIN.0 && v <= Self::MAX.0 {
@@ -41,6 +45,12 @@ impl Integer {
         } else {
             panic!("out of range for Integer")
         }
+    }
+
+    // Like `TryFrom`, but assumes that the range has already been validated.
+    pub(crate) fn from_validated_i64(v: i64) -> Self {
+        debug_assert!(RANGE_I64.contains(&v));
+        Self(v)
     }
 }
 

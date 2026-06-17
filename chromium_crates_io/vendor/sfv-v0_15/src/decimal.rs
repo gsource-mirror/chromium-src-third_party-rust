@@ -29,7 +29,7 @@ impl Decimal {
     ///
     /// ```
     /// let decimal = sfv::Decimal::try_from(1.234).unwrap();
-    /// assert_eq!(i64::try_from(decimal.as_integer_scaled_1000()).unwrap(), 1234);
+    /// assert_eq!(i64::from(decimal.as_integer_scaled_1000()), 1234);
     /// ```
     #[must_use]
     pub fn as_integer_scaled_1000(&self) -> Integer {
@@ -45,7 +45,7 @@ impl Decimal {
     /// ```
     /// let decimal = sfv::Decimal::from_integer_scaled_1000(sfv::integer(1234));
     /// #[allow(clippy::float_cmp)]
-    /// assert_eq!(f64::try_from(decimal).unwrap(), 1.234);
+    /// assert_eq!(f64::from(decimal), 1.234);
     /// ```
     #[must_use]
     pub const fn from_integer_scaled_1000(v: Integer) -> Self {
@@ -146,6 +146,7 @@ impl From<Decimal> for f64 {
     }
 }
 
+/// Prefer using [`Decimal::from_integer_scaled_1000`] for precise conversions.
 impl TryFrom<f32> for Decimal {
     type Error = Error;
 
@@ -154,6 +155,7 @@ impl TryFrom<f32> for Decimal {
     }
 }
 
+/// Prefer using [`Decimal::from_integer_scaled_1000`] for precise conversions.
 impl TryFrom<f64> for Decimal {
     type Error = Error;
 

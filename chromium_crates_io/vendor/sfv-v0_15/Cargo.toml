@@ -11,9 +11,9 @@
 
 [package]
 edition = "2021"
-rust-version = "1.77"
+rust-version = "1.85"
 name = "sfv"
-version = "0.14.0"
+version = "0.15.0"
 authors = ["Tania Batieva <yalyna.ts@gmail.com>"]
 build = false
 exclude = [
@@ -65,7 +65,7 @@ optional = true
 version = "0.22.1"
 
 [dependencies.indexmap]
-version = "2"
+version = "2.7"
 optional = true
 
 [dependencies.ref-cast]

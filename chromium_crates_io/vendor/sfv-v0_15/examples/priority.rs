@@ -33,6 +33,7 @@ fn parse_incremental(v: Option<bool>) -> bool {
 }
 
 impl<'de> sfv::visitor::DictionaryVisitor<'de> for Priority {
+    type Out = Self;
     type Error = std::convert::Infallible;
 
     fn entry(
@@ -47,6 +48,10 @@ impl<'de> sfv::visitor::DictionaryVisitor<'de> for Priority {
             _ => None,
         })
     }
+
+    fn finish(self) -> Result<Self::Out, Self::Error> {
+        Ok(self)
+    }
 }
 
 enum PriorityParameter<'a> {
@@ -55,12 +60,13 @@ enum PriorityParameter<'a> {
 }
 
 impl<'de> sfv::visitor::ItemVisitor<'de> for PriorityParameter<'_> {
+    type Out = ();
     type Error = std::convert::Infallible;
 
     fn bare_item(
         self,
         bare_item: sfv::BareItemFromInput<'de>,
-    ) -> Result<impl sfv::visitor::ParameterVisitor<'de>, Self::Error> {
+    ) -> Result<impl sfv::visitor::ParameterVisitor<'de, Out = Self::Out>, Self::Error> {
         // Per https://httpwg.org/specs/rfc9218.html#parameters values of
         // unexpected types and out-of-range values are ignored. Since the same
         // dictionary key can appear multiple times in the input, and only the
@@ -77,6 +83,12 @@ impl<'de> sfv::visitor::ItemVisitor<'de> for PriorityParameter<'_> {
 }
 
 impl<'de> sfv::visitor::EntryVisitor<'de> for PriorityParameter<'_> {
+    type Error = std::convert::Infallible;
+
+    fn item(self) -> Result<impl sfv::visitor::ItemVisitor<'de>, Self::Error> {
+        Ok(self)
+    }
+
     fn inner_list(self) -> Result<impl sfv::visitor::InnerListVisitor<'de>, Self::Error> {
         // Per https://httpwg.org/specs/rfc9218.html#parameters values of
         // unexpected types are ignored. Since the same dictionary key can
@@ -217,20 +229,16 @@ fn main() -> Result<(), sfv::Error> {
             Priority::from(
                 &sfv::Parser::new(input)
                     .with_version(sfv::Version::Rfc8941)
-                    .parse()?
+                    .parse::<sfv::Dictionary>()?
             ),
             expected,
             "{input}"
         );
 
         assert_eq!(
-            {
-                let mut priority = Priority::default();
-                sfv::Parser::new(input)
-                    .with_version(sfv::Version::Rfc8941)
-                    .parse_dictionary_with_visitor(&mut priority)?;
-                priority
-            },
+            sfv::Parser::new(input)
+                .with_version(sfv::Version::Rfc8941)
+                .parse_dictionary::<Priority>()?,
             expected,
             "{input}"
         );
